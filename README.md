@@ -1,47 +1,52 @@
 # SSH Connections
 
-Eine GNOME-Shell-Extension zum Speichern, Gruppieren und schnellen Öffnen von SSH-Verbindungen.
+A GNOME Shell extension for saving, grouping, monitoring, and quickly opening SSH connections.
 
-## Funktionen
+## Features
 
-- SSH-Profile mit Name, Host, Benutzer, Port und privatem Schlüssel
-- Start in einem neuen GNOME Terminal
-- Automatische Schlüssel-Einrichtung über `ssh-copy-id`
-- Passwörter werden nicht gespeichert
-- Hintergrund-Monitoring per Ping
-- Serverinformationen per SSH: Betriebssystem, Version, Festplatte und Uptime
-- Kategorien und frei sortierbare Serverlisten
-- Panel-Position links oder rechts
-- Deutsch, Englisch, Spanisch und Französisch
+- SSH profiles with name, host, user, port, and private key
+- Opens connections in a new GNOME Terminal window
+- Automatic first-time key setup using `ssh-copy-id`
+- Passwords are never stored by the extension
+- Background reachability monitoring via ICMP ping
+- Server information via SSH: operating system, version, disk usage, and uptime
+- Categories with reorderable server lists
+- Panel icon position can be set to left or right
+- German, English, Spanish, and French interface translations
 
-## Voraussetzungen
+## Requirements
 
 - GNOME Shell 45–50
-- `ssh`, `ssh-copy-id`, `ssh-keygen`
-- GNOME Terminal, `kgx` oder `xterm`
+- `ssh`, `ssh-copy-id`, and `ssh-keygen`
+- GNOME Terminal, `kgx`, or `xterm`
 
-## Installation aus einem Release-Paket
+## Installation from a release package
 
 ```bash
 gnome-extensions install --force ssh-connections@pstrakeljahn.shell-extension.zip
 gnome-extensions enable ssh-connections@pstrakeljahn
 ```
 
-Unter Wayland ist nach der ersten Installation eine Ab- und Anmeldung nötig. Danach können Änderungen meist mit `disable`/`enable` geladen werden.
+On Wayland, log out and back in after the first installation. Later changes can usually be loaded with:
 
-## Entwicklung
+```bash
+gnome-extensions disable ssh-connections@pstrakeljahn
+gnome-extensions enable ssh-connections@pstrakeljahn
+```
+
+## Development
 
 ```bash
 make check
 make pack
 ```
 
-Das fertige Paket liegt anschließend unter `dist/`.
+The release package is written to `dist/`.
 
-## Sicherheit
+## Security
 
-Die Extension speichert keine Passwörter. Für die erste Einrichtung nutzt sie `ssh-copy-id`; danach authentifiziert SSH über den lokalen privaten Schlüssel oder den SSH-Agenten. Host-Key-Prüfungen und `~/.ssh/config` bleiben Bestandteil des normalen SSH-Verhaltens.
+The extension does not store passwords. For first-time setup it uses `ssh-copy-id`; subsequent connections use the local private key or SSH agent. Host-key verification and `~/.ssh/config` remain part of the normal SSH behavior.
 
-## Lizenz
+## License
 
-MIT – siehe [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).
