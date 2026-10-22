@@ -31,8 +31,20 @@ class SSHMenuItem extends PopupMenu.PopupBaseMenuItem {
         const target = profile.user ? `${profile.user}@${profile.host}` : profile.host;
         box.add_child(new St.Label({text: `${target}:${profile.port || 22}`, style_class: 'ssh-profile-host'}));
         if (info?.disk || info?.uptime || info?.system) {
-            const details = [info.system ? `${TEXT.system} ${info.system}${info.version ? ` ${info.version}` : ''}` : '', info.disk ? `${TEXT.disk} ${info.disk}` : '', info.uptime ? `${TEXT.uptime} ${info.uptime}` : ''].filter(Boolean).join(' · ');
-            box.add_child(new St.Label({text: details, style_class: 'ssh-profile-info'}));
+            if (info.system) box.add_child(new St.Label({text: `${TEXT.system}: ${info.system}`, style_class: 'ssh-profile-info'}));
+            if (info.uptime) box.add_child(new St.Label({text: `${TEXT.uptime}: ${info.uptime}`, style_class: 'ssh-profile-info'}));
+            if (info.disk) {
+                const diskRow = new St.BoxLayout({style_class: 'ssh-disk-row'});
+                diskRow.add_child(new St.Label({text: `${TEXT.disk}:`, style_class: 'ssh-profile-info'}));
+                const track = new St.Widget({style_class: 'ssh-disk-track'});
+                const percent = Math.max(0, Math.min(100, Number.parseInt(info.disk, 10) || 0));
+                const fill = new St.Widget({style_class: 'ssh-disk-fill'});
+                fill.set_style(`width: ${Math.max(1, percent)}px;`);
+                track.add_child(fill);
+                diskRow.add_child(track);
+                diskRow.add_child(new St.Label({text: info.disk, style_class: 'ssh-disk-percent'}));
+                box.add_child(diskRow);
+            }
         }
         this.add_child(box);
 
@@ -105,7 +117,7 @@ export default class SSHConnectionsExtension extends Extension {
             menu.addMenuItem(empty);
         } else {
             const uncategorized = profiles.filter(profile => !profile.category);
-            this._addProfileGroup(menu, uncategorized, TEXT.uncategorized, !uncategorized.length);
+            this._addProfileGroup(menu, uncategorized, null, !uncategorized.length);
             const categories = this._categories();
             categories.forEach(category => {
                 const members = profiles.filter(profile => profile.category === category);
@@ -120,6 +132,10 @@ export default class SSHConnectionsExtension extends Extension {
         menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         const settingsRow = new PopupMenu.PopupMenuItem('', {reactive: false, can_focus: false});
         settingsRow.label.hide();
+        const refreshButton = new St.Button({style_class: 'ssh-settings-button', child: new St.Icon({icon_name: 'view-refresh-symbolic', style_class: 'ssh-settings-icon'}), reactive: true, can_focus: true});
+        refreshButton.set_accessible_name(TEXT.refresh);
+        refreshButton.connect('clicked', () => this._monitorAll(true));
+        settingsRow.add_child(refreshButton);
         const settingsButton = new St.Button({style_class: 'ssh-settings-button', child: new St.Icon({icon_name: 'preferences-system-symbolic', style_class: 'ssh-settings-icon'}), reactive: true, can_focus: true});
         settingsButton.set_accessible_name(TEXT.settings);
         settingsButton.connect('clicked', () => this.openPreferences());
@@ -162,8 +178,8 @@ export default class SSHConnectionsExtension extends Extension {
         });
     }
 
-    _monitorAll() {
-        if (!this._settings.get_boolean('monitoring-enabled')) return;
+    _monitorAll(force = false) {
+        if (!force && !this._settings.get_boolean('monitoring-enabled')) return;
         this._profiles().forEach(profile => this._ping(profile));
         this._rebuildMenu();
     }
