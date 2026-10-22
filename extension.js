@@ -1,5 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 import GObject from 'gi://GObject';
 
@@ -24,7 +25,7 @@ class SSHMenuItem extends PopupMenu.PopupBaseMenuItem {
         this._onConnect = onConnect;
 
         const statusColor = status === 'online' ? '#8bd5ca' : status === 'offline' ? '#f28fad' : '#f6c177';
-        const dot = new St.Widget({style_class: 'ssh-profile-dot', style: `background-color: ${statusColor};`});
+        const dot = new St.Widget({style_class: 'ssh-profile-dot', style: `background-color: ${statusColor};`, x_expand: false, y_expand: false, x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.CENTER});
         this.add_child(dot);
         const box = new St.BoxLayout({vertical: true, x_expand: true});
         box.add_child(new St.Label({text: profile.name || profile.host, style_class: 'ssh-profile-name'}));
@@ -44,8 +45,8 @@ class SSHMenuItem extends PopupMenu.PopupBaseMenuItem {
                 box.add_child(uptimeRow);
             }
             if (info.disk) {
-                const diskRow = new St.BoxLayout({style_class: 'ssh-disk-row', x_expand: true});
-                const track = new St.Widget({style_class: 'ssh-disk-track', x_expand: true});
+                const diskRow = new St.BoxLayout({style_class: 'ssh-disk-row', x_expand: true, x_align: Clutter.ActorAlign.FILL});
+                const track = new St.Widget({style_class: 'ssh-disk-track', x_expand: true, x_align: Clutter.ActorAlign.FILL});
                 const [usedText, totalSize] = info.disk.split('|');
                 const percent = Math.max(0, Math.min(100, Number.parseInt(usedText, 10) || 0));
                 const fill = new St.Widget({style_class: 'ssh-disk-fill'});
