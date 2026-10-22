@@ -92,7 +92,11 @@ export default class SSHConnectionsExtension extends Extension {
         this._settings?.disconnectObject(this);
         if (this._pingSource) GLib.source_remove(this._pingSource);
         this._pingSource = 0;
+        this._panelIcon?.destroy();
+        this._summary?.destroy();
         this._indicator?.destroy();
+        this._panelIcon = null;
+        this._summary = null;
         this._settings = null;
         this._indicator = null;
     }
@@ -103,7 +107,11 @@ export default class SSHConnectionsExtension extends Extension {
     }
 
     _createIndicator() {
+        this._panelIcon?.destroy();
+        this._summary?.destroy();
         this._indicator?.destroy();
+        this._panelIcon = null;
+        this._summary = null;
         this._panelIcon = new St.Icon({icon_name: 'network-server-symbolic', style_class: 'ssh-panel-icon'});
         this._summary = new St.Label({text: '', style_class: 'ssh-panel-summary'});
         this._indicator = new PanelMenu.Button(0.5, TEXT.title, false);

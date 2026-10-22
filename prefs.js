@@ -58,6 +58,14 @@ export default class SSHConnectionsPreferences extends ExtensionPreferences {
         this._settings.connect('changed::categories', () => { this._renderCategories(); this._render(); });
         this._renderCategories();
         this._render();
+        window.connect('close-request', () => {
+            this._settings = null;
+            this._window = null;
+            this._categoryList = null;
+            this._categoryEntry = null;
+            this._list = null;
+            return false;
+        });
     }
 
     _get() { try { return JSON.parse(this._settings.get_string('profiles')) || []; } catch (_) { return []; } }
