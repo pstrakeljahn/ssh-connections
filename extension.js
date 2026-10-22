@@ -31,18 +31,28 @@ class SSHMenuItem extends PopupMenu.PopupBaseMenuItem {
         const target = profile.user ? `${profile.user}@${profile.host}` : profile.host;
         box.add_child(new St.Label({text: `${target}:${profile.port || 22}`, style_class: 'ssh-profile-host'}));
         if (info?.disk || info?.uptime || info?.system) {
-            if (info.system) box.add_child(new St.Label({text: `${TEXT.system}: ${info.system}`, style_class: 'ssh-profile-info'}));
-            if (info.uptime) box.add_child(new St.Label({text: `${TEXT.uptime}: ${info.uptime}`, style_class: 'ssh-profile-info'}));
+            if (info.system) {
+                const systemRow = new St.BoxLayout({style_class: 'ssh-info-row'});
+                systemRow.add_child(new St.Icon({icon_name: 'computer-symbolic', style_class: 'ssh-info-icon'}));
+                systemRow.add_child(new St.Label({text: info.system, style_class: 'ssh-profile-info'}));
+                box.add_child(systemRow);
+            }
+            if (info.uptime) {
+                const uptimeRow = new St.BoxLayout({style_class: 'ssh-info-row'});
+                uptimeRow.add_child(new St.Icon({icon_name: 'preferences-system-time-symbolic', style_class: 'ssh-info-icon'}));
+                uptimeRow.add_child(new St.Label({text: info.uptime, style_class: 'ssh-profile-info'}));
+                box.add_child(uptimeRow);
+            }
             if (info.disk) {
                 const diskRow = new St.BoxLayout({style_class: 'ssh-disk-row'});
-                diskRow.add_child(new St.Label({text: `${TEXT.disk}:`, style_class: 'ssh-profile-info'}));
                 const track = new St.Widget({style_class: 'ssh-disk-track'});
-                const percent = Math.max(0, Math.min(100, Number.parseInt(info.disk, 10) || 0));
+                const [usedText, totalSize] = info.disk.split('|');
+                const percent = Math.max(0, Math.min(100, Number.parseInt(usedText, 10) || 0));
                 const fill = new St.Widget({style_class: 'ssh-disk-fill'});
                 fill.set_style(`width: ${Math.max(1, percent)}px;`);
                 track.add_child(fill);
                 diskRow.add_child(track);
-                diskRow.add_child(new St.Label({text: info.disk, style_class: 'ssh-disk-percent'}));
+                diskRow.add_child(new St.Label({text: `${usedText || `${percent}%`} / ${totalSize || ''}`.trim(), style_class: 'ssh-disk-percent'}));
                 box.add_child(diskRow);
             }
         }
@@ -210,7 +220,7 @@ export default class SSHConnectionsExtension extends Extension {
     _fetchInfo(profile) {
         const id = profile.id || this._profileId(profile);
         const {target, key, port} = this._connectionData(profile);
-        const command = "if [ -r /etc/os-release ]; then . /etc/os-release; printf '%s\\n' \"$PRETTY_NAME\"; else uname -s; fi; df -P -h / | awk 'NR==2 {print $5}' ; uptime -p 2>/dev/null || uptime ; uname -r";
+        const command = "if [ -r /etc/os-release ]; then . /etc/os-release; printf '%s\\n' \"$PRETTY_NAME\"; else uname -s; fi; df -P -h / | awk 'NR==2 {print $5 \"|\" $2}' ; uptime -p 2>/dev/null || uptime ; uname -r";
         try {
             const process = Gio.Subprocess.new([
                 'ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5', '-p', String(port), '-i', key,
