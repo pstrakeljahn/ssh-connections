@@ -44,13 +44,18 @@ class SSHMenuItem extends PopupMenu.PopupBaseMenuItem {
                 box.add_child(uptimeRow);
             }
             if (info.disk) {
-                const diskRow = new St.BoxLayout({style_class: 'ssh-disk-row'});
-                const track = new St.Widget({style_class: 'ssh-disk-track'});
+                const diskRow = new St.BoxLayout({style_class: 'ssh-disk-row', x_expand: true});
+                const track = new St.Widget({style_class: 'ssh-disk-track', x_expand: true});
                 const [usedText, totalSize] = info.disk.split('|');
                 const percent = Math.max(0, Math.min(100, Number.parseInt(usedText, 10) || 0));
                 const fill = new St.Widget({style_class: 'ssh-disk-fill'});
-                fill.set_style(`width: ${Math.max(1, percent)}px;`);
                 track.add_child(fill);
+                const resizeFill = () => {
+                    const width = track.get_width();
+                    if (width > 0) fill.set_width(Math.max(1, Math.round(width * percent / 100)));
+                };
+                track.connect('notify::width', resizeFill);
+                resizeFill();
                 diskRow.add_child(track);
                 diskRow.add_child(new St.Label({text: `${usedText || `${percent}%`} / ${totalSize || ''}`.trim(), style_class: 'ssh-disk-percent'}));
                 box.add_child(diskRow);
