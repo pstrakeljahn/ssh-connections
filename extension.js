@@ -33,13 +33,13 @@ class SSHMenuItem extends PopupMenu.PopupBaseMenuItem {
         box.add_child(new St.Label({text: `${target}:${profile.port || 22}`, style_class: 'ssh-profile-host'}));
         if (info?.disk || info?.uptime || info?.system) {
             if (info.system) {
-                const systemRow = new St.BoxLayout({style_class: 'ssh-info-row'});
+                const systemRow = new St.BoxLayout({style_class: 'ssh-info-row ssh-system-row'});
                 systemRow.add_child(new St.Icon({icon_name: 'computer-symbolic', style_class: 'ssh-info-icon'}));
                 systemRow.add_child(new St.Label({text: info.system, style_class: 'ssh-profile-info'}));
                 box.add_child(systemRow);
             }
             if (info.uptime) {
-                const uptimeRow = new St.BoxLayout({style_class: 'ssh-info-row'});
+                const uptimeRow = new St.BoxLayout({style_class: 'ssh-info-row ssh-uptime-row'});
                 uptimeRow.add_child(new St.Icon({icon_name: 'preferences-system-time-symbolic', style_class: 'ssh-info-icon'}));
                 uptimeRow.add_child(new St.Label({text: info.uptime, style_class: 'ssh-profile-info'}));
                 box.add_child(uptimeRow);
