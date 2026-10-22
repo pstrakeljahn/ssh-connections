@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.ssh-connections" path="/org/gnome/shell/extensions/ssh-connections/">
+    <key name="profiles" type="s">
+      <default>'[]'</default>
+      <summary>SSH profiles</summary>
+      <description>Saved SSH connection profiles as JSON.</description>
+    </key>
+    <key name="categories" type="s">
+      <default>'[]'</default>
+      <summary>Server categories</summary>
+      <description>Saved server categories as JSON.</description>
+    </key>
+    <key name="monitoring-enabled" type="b">
+      <default>true</default>
+      <summary>Enable server monitoring</summary>
+      <description>Periodically ping saved servers.</description>
+    </key>
+    <key name="ping-interval" type="i">
+      <default>300</default>
+      <summary>Ping interval</summary>
+      <description>Seconds between monitoring checks.</description>
+    </key>
+    <key name="panel-position" type="s">
+      <default>'right'</default>
+      <summary>Panel icon position</summary>
+      <description>Place the SSH icon on the left or right side of the panel.</description>
+    </key>
+    <key name="language" type="s">
+      <default>'system'</default>
+      <summary>Interface language</summary>
+      <description>Language used by the extension.</description>
+    </key>
+  </schema>
+</schemalist>
